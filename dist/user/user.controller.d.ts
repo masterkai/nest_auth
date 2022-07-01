@@ -20,7 +20,7 @@ export declare class UserController {
     refresh(request: Request, response: Response): Promise<{
         token: string;
     }>;
-    logout(response: Response): Promise<{
+    logout(request: Request, response: Response): Promise<{
         message: string;
     }>;
 }

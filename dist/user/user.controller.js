@@ -29,6 +29,7 @@ const user_service_1 = require("./user.service");
 const bcryptjs = require("bcryptjs");
 const jwt_1 = require("@nestjs/jwt");
 const token_service_1 = require("./token.service");
+const typeorm_1 = require("typeorm");
 let UserController = class UserController {
     constructor(userService, tokenService, jwtService) {
         this.userService = userService;
@@ -38,6 +39,10 @@ let UserController = class UserController {
     async register(body) {
         if (body.password !== body.password_confirm) {
             throw new common_1.BadRequestException('Password do not match!');
+        }
+        const user = await this.userService.findOne({ email: body.email });
+        if (user) {
+            throw new common_1.BadRequestException('user existed, login please!!');
         }
         return this.userService.save({
             first_name: body.first_name,
@@ -67,6 +72,7 @@ let UserController = class UserController {
         await this.tokenService.save({
             user_id: user.id,
             token: refreshToken,
+            created_at: new Date(),
             expired_at,
         });
         response.status(200);
@@ -93,17 +99,25 @@ let UserController = class UserController {
         try {
             const refreshToken = request.cookies['refresh_token'];
             const { id } = await this.jwtService.verifyAsync(refreshToken);
-            const token = await this.jwtService.signAsync({
+            const tokenEntity = await this.tokenService.findOne({
+                user_id: id,
+                expired_at: (0, typeorm_1.MoreThanOrEqual)(new Date()),
+            });
+            if (!tokenEntity) {
+                throw new common_1.UnauthorizedException();
+            }
+            const accessToken = await this.jwtService.signAsync({
                 id,
             }, { expiresIn: '30s' });
             response.status(200);
-            return { token };
+            return { token: accessToken };
         }
         catch (e) {
             throw new common_1.UnauthorizedException();
         }
     }
-    async logout(response) {
+    async logout(request, response) {
+        await this.tokenService.delete({ token: request.cookies['refresh_token'] });
         response.clearCookie('refresh_token');
         return {
             message: 'success',
@@ -143,9 +157,10 @@ __decorate([
 ], UserController.prototype, "refresh", null);
 __decorate([
     (0, common_1.Post)('logout'),
-    __param(0, (0, common_1.Res)({ passthrough: true })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "logout", null);
 UserController = __decorate([

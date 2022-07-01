@@ -7,14 +7,18 @@ import { Token } from './token.entity';
 export class TokenService {
   constructor(
     @InjectRepository(Token)
-    protected readonly userRepository: Repository<Token>,
+    protected readonly tokenRepository: Repository<Token>,
   ) {}
 
   async save(body) {
-    return this.userRepository.save(body);
+    return this.tokenRepository.save(body);
   }
 
   async findOne(options) {
-    return this.userRepository.findOne({ where: options });
+    return this.tokenRepository.findOne({ where: options });
+  }
+
+  async delete(options) {
+    return this.tokenRepository.delete(options);
   }
 }

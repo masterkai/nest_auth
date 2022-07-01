@@ -12,29 +12,26 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TokenService = void 0;
+exports.ResetService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const reset_entity_1 = require("./reset.entity");
 const typeorm_2 = require("typeorm");
-const token_entity_1 = require("./token.entity");
-let TokenService = class TokenService {
-    constructor(tokenRepository) {
-        this.tokenRepository = tokenRepository;
+let ResetService = class ResetService {
+    constructor(resetRepository) {
+        this.resetRepository = resetRepository;
     }
     async save(body) {
-        return this.tokenRepository.save(body);
+        return this.resetRepository.save(body);
     }
     async findOne(options) {
-        return this.tokenRepository.findOne({ where: options });
-    }
-    async delete(options) {
-        return this.tokenRepository.delete(options);
+        return this.resetRepository.findOne({ where: options });
     }
 };
-TokenService = __decorate([
+ResetService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(token_entity_1.Token)),
+    __param(0, (0, typeorm_1.InjectRepository)(reset_entity_1.Reset)),
     __metadata("design:paramtypes", [typeorm_2.Repository])
-], TokenService);
-exports.TokenService = TokenService;
-//# sourceMappingURL=token.service.js.map
+], ResetService);
+exports.ResetService = ResetService;
+//# sourceMappingURL=reset.service.js.map

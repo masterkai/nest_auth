@@ -27,6 +27,9 @@ let UserService = class UserService {
     async findOne(options) {
         return this.userRepository.findOne({ where: options });
     }
+    async update(id, options) {
+        return this.userRepository.update(id, options);
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
